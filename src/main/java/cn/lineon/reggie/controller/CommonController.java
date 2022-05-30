@@ -69,6 +69,7 @@ public class CommonController {
             int len=0;
             while ((len=fileInputStream.read(bytes))!=-1){
                 outputStream.write(bytes,0,len);
+                outputStream.flush();
             }
             //关闭流
             fileInputStream.close();

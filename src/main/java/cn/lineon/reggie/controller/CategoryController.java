@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author 刘国庆
@@ -72,5 +73,22 @@ public class CategoryController {
     public R<String> update(@RequestBody Category category){
         categoryService.updateById(category);
         return R.success("修改分类成功!");
+    }
+
+    /**
+     * 根据条件来查询菜品分类
+     * @param category
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category){
+        //创建条件构造器
+        LambdaQueryWrapper<Category> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //添加条件
+        categoryLambdaQueryWrapper.eq(category.getType()!=null,Category::getType,category.getType());
+        categoryLambdaQueryWrapper.orderByAsc(Category::getSort).orderByAsc(Category::getUpdateTime);
+        //执行查询
+        List<Category> list = categoryService.list(categoryLambdaQueryWrapper);
+        return R.success(list);
     }
 }
