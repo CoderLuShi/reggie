@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/dish")
-public class  DishController {
+public class DishController {
     @Autowired
     private DishService dishService;
 
@@ -36,12 +36,14 @@ public class  DishController {
 
     @Autowired
     private CategoryService categoryService;
+
     /**
      * 添加菜品
+     *
      * @return
      */
     @PostMapping
-    public R<String> save(@RequestBody DishDto dishDto){
+    public R<String> save(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
         dishService.saveWithFlavor(dishDto);
         return R.success("添加菜品成功！");
@@ -49,29 +51,29 @@ public class  DishController {
 
     /**
      * 分页查询
+     *
      * @param page
      * @param pageSize
      * @return
      */
     @GetMapping("/page")
-    public R<Page> page(int page, int pageSize,String name){
+    public R<Page> page(int page, int pageSize, String name) {
         //分页构造器
         Page<Dish> pageInfo = new Page<>(page, pageSize);
         Page<DishDto> dishDtoPage = new Page<>();
         //条件构造器
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        dishLambdaQueryWrapper.eq(name!=null,Dish::getName,name);
+        dishLambdaQueryWrapper.eq(name != null, Dish::getName, name);
         //添加排序条件
         dishLambdaQueryWrapper.orderByDesc(Dish::getUpdateTime);
         //执行分页查询
         pageInfo = dishService.page(pageInfo, dishLambdaQueryWrapper);
-
         //对象拷贝
-        BeanUtils.copyProperties(pageInfo,dishDtoPage,"records");
+        BeanUtils.copyProperties(pageInfo, dishDtoPage, "records");
         List<Dish> records = pageInfo.getRecords();
-        List<DishDto> list=records.stream().map((item)->{
+        List<DishDto> list = records.stream().map((item) -> {
             DishDto dishDto = new DishDto();
-            BeanUtils.copyProperties(item,dishDto);
+            BeanUtils.copyProperties(item, dishDto);
             Long categoryId = item.getCategoryId();//分类ID
             //根据分类ID查询分类名称
             Category category = categoryService.getById(categoryId);
@@ -85,11 +87,12 @@ public class  DishController {
 
     /**
      * 删除菜品
+     *
      * @param param
      * @return
      */
     @DeleteMapping
-    public R<String> delete(String param){
-        return  null;
+    public R<String> delete(String param) {
+        return null;
     }
 }
