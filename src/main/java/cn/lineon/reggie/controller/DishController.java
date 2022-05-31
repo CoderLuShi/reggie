@@ -8,6 +8,7 @@ import cn.lineon.reggie.service.CategoryService;
 import cn.lineon.reggie.service.DishFlavorService;
 import cn.lineon.reggie.service.DishService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -110,12 +111,29 @@ public class DishController {
     }
     /**
      * 删除菜品
-     *
-     * @param param
+     * @param ids
      * @return
      */
     @DeleteMapping
-    public R<String> delete(String param) {
-        return null;
+    public R<String> delete(Long ids) {
+        dishService.removeById(ids);
+        return R.success("删除菜品成功");
+    }
+
+    /**
+     * 修改售卖状态
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R<String> status(@PathVariable int status,Long ids){
+        log.info(status+"");
+        LambdaUpdateWrapper<Dish> dishLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        dishLambdaUpdateWrapper
+                .eq(Dish::getId,ids)
+                .set(Dish::getStatus,status);
+        dishService.update(dishLambdaUpdateWrapper);
+        return R.success("修改售卖状态成功！");
     }
 }
