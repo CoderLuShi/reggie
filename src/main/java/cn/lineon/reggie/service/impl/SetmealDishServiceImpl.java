@@ -4,6 +4,7 @@ import cn.lineon.reggie.entity.SetmealDish;
 import cn.lineon.reggie.mapper.SetmealDishMapper;
 import cn.lineon.reggie.service.SetmealDishService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
 
 /**
  * @author 刘国庆
@@ -12,5 +13,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @Description TODO
  * @createTime 2022年05月16日 17:10:00
  */
+@Service
 public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, SetmealDish> implements SetmealDishService {
 }

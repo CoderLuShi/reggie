@@ -90,17 +90,19 @@ public class DishController {
 
     /**
      * 根据ID查询菜品信息及其口味
+     *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public R<DishDto> getById(@PathVariable Long id){
+    public R<DishDto> getById(@PathVariable Long id) {
         DishDto dishDto = dishService.getByIdWithFlavor(id);
         return R.success(dishDto);
     }
 
     /**
      * 更改菜品信息
+     *
      * @param dishDto
      * @return
      */
@@ -110,8 +112,10 @@ public class DishController {
         dishService.updateWithFlavor(dishDto);
         return R.success("修改菜品成功！");
     }
+
     /**
      * 删除菜品
+     *
      * @param ids
      * @return
      */
@@ -124,18 +128,32 @@ public class DishController {
 
     /**
      * 批量修改售卖状态
+     *
      * @param status
      * @param ids
      * @return
      */
     @PostMapping("/status/{status}")
-    public R<String> status(@PathVariable int status,@RequestParam ArrayList<Long> ids){
+    public R<String> status(@PathVariable int status, @RequestParam ArrayList<Long> ids) {
         LambdaUpdateWrapper<Dish> dishLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         dishLambdaUpdateWrapper.
-                in(Dish::getId,ids).
-                set(Dish::getStatus,status);
+                in(Dish::getId, ids).
+                set(Dish::getStatus, status);
 
         dishService.update(dishLambdaUpdateWrapper);
         return R.success("修改售卖状态成功！");
+    }
+
+    /**
+     * 根据条件查询对应的菜品数据
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishLambdaQueryWrapper.eq(Dish::getCategoryId,dish.getCategoryId());
+        List<Dish> list = dishService.list(dishLambdaQueryWrapper);
+        return R.success(list);
     }
 }
