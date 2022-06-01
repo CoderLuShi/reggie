@@ -7,6 +7,7 @@ import cn.lineon.reggie.mapper.DishMapper;
 import cn.lineon.reggie.service.DishFlavorService;
 import cn.lineon.reggie.service.DishService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ import java.util.List;
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
     @Autowired
     public DishFlavorService dishFlavorService;
+
+    /**
+     * 添加菜品信息
+     * @param dishDto
+     */
     @Override
     @Transactional
     public void saveWithFlavor(DishDto dishDto) {
@@ -42,7 +48,12 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishFlavorService.saveBatch(flavors);
     }
 
+    /**
+     * 更新菜品及其口味信息
+     * @param dishDto
+     */
     @Override
+    @Transactional
     public void updateWithFlavor(DishDto dishDto) {
         //保存菜品基本信息到菜品表
         this.updateById(dishDto);
@@ -62,6 +73,26 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishFlavorService.saveBatch(flavors);
     }
 
+    /**
+     * 删除菜品及其口味信息
+     * @param ids
+     */
+    @Override
+    @Transactional
+    public void deleteWithFlavor(List<Long> ids) {
+        //删除菜品信息
+        this.removeByIds(ids);
+        //删除菜品口味信息
+        LambdaUpdateWrapper<DishFlavor> dishFlavorLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        dishFlavorLambdaUpdateWrapper.in(DishFlavor::getDishId,ids);
+        dishFlavorService.remove(dishFlavorLambdaUpdateWrapper);
+    }
+
+    /**
+     * 根据ID查询菜品及其口味信息
+     * @param id
+     * @return
+     */
     @Override
     public DishDto getByIdWithFlavor(Long id) {
         //根据ID查询菜品信息

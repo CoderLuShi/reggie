@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,24 +116,25 @@ public class DishController {
      * @return
      */
     @DeleteMapping
-    public R<String> delete(Long ids) {
-        dishService.removeById(ids);
+    public R<String> delete(@RequestParam ArrayList<Long> ids) {
+        log.info(ids.toString());
+        dishService.deleteWithFlavor(ids);
         return R.success("删除菜品成功");
     }
 
     /**
-     * 修改售卖状态
+     * 批量修改售卖状态
      * @param status
      * @param ids
      * @return
      */
     @PostMapping("/status/{status}")
-    public R<String> status(@PathVariable int status,Long ids){
-        log.info(status+"");
+    public R<String> status(@PathVariable int status,@RequestParam ArrayList<Long> ids){
         LambdaUpdateWrapper<Dish> dishLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        dishLambdaUpdateWrapper
-                .eq(Dish::getId,ids)
-                .set(Dish::getStatus,status);
+        dishLambdaUpdateWrapper.
+                in(Dish::getId,ids).
+                set(Dish::getStatus,status);
+
         dishService.update(dishLambdaUpdateWrapper);
         return R.success("修改售卖状态成功！");
     }
