@@ -7,7 +7,7 @@ package cn.lineon.reggie.common;
  * @Description 基于ThreadLocal封装的工具类，用于获取用户ID
  * @createTime 2022年05月15日 15:40:00
  */
-public class BaseContent {
+public class BaseContext {
     private static ThreadLocal<Long> threadLocal=new ThreadLocal<>();
     public static long getCurrentId(){
         return threadLocal.get();

@@ -1,6 +1,6 @@
 package cn.lineon.reggie.config;
 
-import cn.lineon.reggie.common.BaseContent;
+import cn.lineon.reggie.common.BaseContext;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
@@ -17,14 +17,14 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         log.info("start insert fill ....");
         this.strictInsertFill(metaObject, "createTime", () -> LocalDateTime.now(), LocalDateTime.class);
         this.strictUpdateFill(metaObject, "updateTime", () -> LocalDateTime.now(), LocalDateTime.class);
-        metaObject.setValue("createUser", BaseContent.getCurrentId());
-        metaObject.setValue("updateUser",BaseContent.getCurrentId());
+        metaObject.setValue("createUser", BaseContext.getCurrentId());
+        metaObject.setValue("updateUser", BaseContext.getCurrentId());
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         log.info("start update fill ....");
         this.strictUpdateFill(metaObject, "updateTime", () -> LocalDateTime.now(), LocalDateTime.class);
-        metaObject.setValue("updateUser",BaseContent.getCurrentId());
+        metaObject.setValue("updateUser", BaseContext.getCurrentId());
     }
 }

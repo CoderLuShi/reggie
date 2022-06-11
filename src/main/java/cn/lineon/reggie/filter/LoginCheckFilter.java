@@ -1,10 +1,9 @@
 package cn.lineon.reggie.filter;
 
-import cn.lineon.reggie.common.BaseContent;
+import cn.lineon.reggie.common.BaseContext;
 import cn.lineon.reggie.common.R;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
@@ -33,7 +32,9 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "/front/**"
+                "/front/**",
+                "/user/sendMessage",
+                "/user/login"
         };
         //3.判断请求是否需要处理
         boolean check = check(urls, requestURI);
@@ -42,10 +43,17 @@ public class LoginCheckFilter implements Filter {
             filterChain.doFilter(request,response);
             return;
         }
-        //5.判断登录状态，如果已登录直接放行
+        //5.1 判断登录状态，如果已登录直接放行
         if(request.getSession().getAttribute("employee")!=null){
             //设置值
-            BaseContent.setCurrentId((Long) request.getSession().getAttribute("employee"));
+            BaseContext.setCurrentId((Long) request.getSession().getAttribute("employee"));
+            filterChain.doFilter(request,response);
+            return;
+        }
+        //5.2 判断登录状态，如果已登录直接放行
+        if(request.getSession().getAttribute("user")!=null){
+            //设置值
+            BaseContext.setCurrentId((Long) request.getSession().getAttribute("user"));
             filterChain.doFilter(request,response);
             return;
         }
