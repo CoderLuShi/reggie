@@ -2,7 +2,6 @@ server:
   port: 8080
 spring:
   application:
-    #???????
     name: reggie_take_out
   datasource:
     druid:
@@ -12,7 +11,6 @@ spring:
       password: 123456
 mybatis-plus:
   configuration:
-    #???????????????????????????????????????
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
@@ -20,3 +18,15 @@ mybatis-plus:
       id-type: ASSIGN_ID
 reggie:
   path: D:/img/
+  #Redis设置
+redis:
+  host: localhost
+  port: 6379
+  database: 0
+jedis:
+  #Redis连接池配置
+  pool:
+    max-active: 8 #最大连接数
+    max-wait: 1ms #连接池中的最大等待数
+    max-idle: 4 #连接池中的最大空闲连接
+    min-idle: 1 #连接池中的最小空闲连接
