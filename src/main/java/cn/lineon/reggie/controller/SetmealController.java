@@ -38,8 +38,9 @@ public class SetmealController {
 
     @Autowired
     private CategoryService categoryService;
+
     @PostMapping
-    public R<String> save(@RequestBody SetmealDto setmealDto){
+    public R<String> save(@RequestBody SetmealDto setmealDto) {
         log.info(setmealDto.toString());
         setmealService.saveWithDish(setmealDto);
         return R.success("添加套餐信息成功！");
@@ -47,27 +48,28 @@ public class SetmealController {
 
     /**
      * 分页查询
+     *
      * @param page
      * @param pageSize
      * @param name
      * @return
      */
     @GetMapping("/page")
-    public R<Page> page(int page,int pageSize,String name){
+    public R<Page> page(int page, int pageSize, String name) {
         //分页构造器
-        Page<Setmeal> pageInfo = new Page<>(page,pageSize);
+        Page<Setmeal> pageInfo = new Page<>(page, pageSize);
         Page<SetmealDto> setmealDtoPageInfo = new Page<>();
         //条件构造器
         LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        setmealLambdaQueryWrapper.like(name!=null,Setmeal::getName,name);
+        setmealLambdaQueryWrapper.like(name != null, Setmeal::getName, name);
         setmealLambdaQueryWrapper.orderByDesc(Setmeal::getUpdateTime);
-        pageInfo=setmealService.page(pageInfo,setmealLambdaQueryWrapper);
+        pageInfo = setmealService.page(pageInfo, setmealLambdaQueryWrapper);
         //对象拷贝
-        BeanUtils.copyProperties(pageInfo,setmealDtoPageInfo,"records");
+        BeanUtils.copyProperties(pageInfo, setmealDtoPageInfo, "records");
         List<Setmeal> records = pageInfo.getRecords();
-        List<SetmealDto> list=records.stream().map((item)->{
+        List<SetmealDto> list = records.stream().map((item) -> {
             SetmealDto setmealDto = new SetmealDto();
-            BeanUtils.copyProperties(item,setmealDto);
+            BeanUtils.copyProperties(item, setmealDto);
             //根据分类ID查询套餐
             Category category = categoryService.getById(item.getCategoryId());
             setmealDto.setCategoryName(category.getName());
@@ -80,6 +82,7 @@ public class SetmealController {
 
     /**
      * 删除套餐
+     *
      * @param ids
      * @return
      */
@@ -91,6 +94,7 @@ public class SetmealController {
 
     /**
      * 修改售卖状态
+     *
      * @param status
      * @param ids
      * @return
@@ -99,31 +103,49 @@ public class SetmealController {
     public R<String> status(@PathVariable int status, @RequestParam ArrayList<Long> ids) {
         LambdaUpdateWrapper<Setmeal> setmealLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         setmealLambdaUpdateWrapper
-                .in(Setmeal::getId,ids)
-                .set(Setmeal::getStatus,status);
+                .in(Setmeal::getId, ids)
+                .set(Setmeal::getStatus, status);
         setmealService.update(setmealLambdaUpdateWrapper);
         return R.success("修改售卖状态成功！");
     }
 
     /**
      * 根据ID获取套餐及其菜品信息
+     *
      * @param id
      * @return
      */
     @GetMapping("{id}")
-    public R<SetmealDto> getSetmealById(@PathVariable Long id){
+    public R<SetmealDto> getSetmealById(@PathVariable Long id) {
         SetmealDto setmealDto = setmealService.getWithDish(id);
         return R.success(setmealDto);
     }
 
     /**
      * 更新套餐及其菜品信息
+     *
      * @param setmealDto
      * @return
      */
     @PutMapping
-    public R<String> updateSetmeal(@RequestBody SetmealDto setmealDto){
+    public R<String> updateSetmeal(@RequestBody SetmealDto setmealDto) {
         setmealService.updateWithDish(setmealDto);
         return R.success("更新菜品成功！");
+    }
+
+    /**
+     * 根据条件查询套餐分类信息
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal) {
+        //根据分类ID查询套餐信息
+        LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealLambdaQueryWrapper
+                .eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId())
+                .eq(setmeal.getStatus()!=null,Setmeal::getStatus,setmeal.getStatus());
+        List<Setmeal> list = setmealService.list(setmealLambdaQueryWrapper);
+        return R.success(list);
     }
 }

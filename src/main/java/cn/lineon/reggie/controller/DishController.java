@@ -4,6 +4,7 @@ import cn.lineon.reggie.common.R;
 import cn.lineon.reggie.dto.DishDto;
 import cn.lineon.reggie.entity.Category;
 import cn.lineon.reggie.entity.Dish;
+import cn.lineon.reggie.entity.DishFlavor;
 import cn.lineon.reggie.service.CategoryService;
 import cn.lineon.reggie.service.DishFlavorService;
 import cn.lineon.reggie.service.DishService;
@@ -145,15 +146,33 @@ public class DishController {
     }
 
     /**
-     * 根据条件查询对应的菜品数据
+     * 根据条件查询对应的菜品数据 V2
      * @param dish
      * @return
      */
     @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
+        List<DishDto> dishDtos = new ArrayList<>();
+        //根据分类查询在售菜品信息
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        dishLambdaQueryWrapper.eq(Dish::getCategoryId,dish.getCategoryId());
+        dishLambdaQueryWrapper
+                .eq(Dish::getCategoryId,dish.getCategoryId())
+                .eq(Dish::getStatus,1);
         List<Dish> list = dishService.list(dishLambdaQueryWrapper);
-        return R.success(list);
+        //根据菜品查询对应口味信息
+        dishDtos=list.stream().map((item)->{
+            DishDto dishDto = new DishDto();
+            //根据菜品ID查询对应口味信息
+            LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId,item.getId());
+            List<DishFlavor> dishFlavors = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
+            //对象拷贝
+            BeanUtils.copyProperties(item,dishDto);
+            //设置口味信息
+            dishDto.setFlavors(dishFlavors);
+            return dishDto;
+        }).collect(Collectors.toList());
+        return R.success(dishDtos);
+
     }
 }
